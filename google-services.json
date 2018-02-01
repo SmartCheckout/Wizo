@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "999360434103",
+    "firebase_url": "https://smartcheckout-2846e.firebaseio.com",
+    "project_id": "smartcheckout-2846e",
+    "storage_bucket": "smartcheckout-2846e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:999360434103:android:e01c5bb393beb08a",
+        "android_client_info": {
+          "package_name": "com.smartcheckout.poc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "999360434103-ec9artf7mv5ul3sbtpi6hl6b6egradgj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZiMMnI2oPtm2N0DvaHzZ51sljNRlUjXY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

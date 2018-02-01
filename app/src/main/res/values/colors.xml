@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#49c1ef</color>
+    <color name="colorPrimaryDark">#0091d2</color>
+    <color name="colorAccent">#666666</color>
+    <color name="pink">#E91E63</color>
+    <color name="indigo">#3F51B5</color>
+    <color name="paymentNormal">#8BC34A</color>
+    <color name="paymentPressed">#4CAF50</color>
+    <color name="paymentStroke">#39be31</color>
+</resources>
