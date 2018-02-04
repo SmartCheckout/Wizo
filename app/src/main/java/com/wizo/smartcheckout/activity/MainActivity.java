@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.TextViewCompat;
 import android.util.Log;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -23,42 +22,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResolvableApiException;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.razorpay.PaymentResultListener;
 import com.wizo.smartcheckout.R;
-import com.wizo.smartcheckout.util.SharedPreferrencesUtil;
 import com.wizo.smartcheckout.util.StateData;
 import com.wizo.smartcheckout.util.TransactionStatus;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.ContentType;
@@ -67,10 +41,10 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static com.wizo.smartcheckout.constant.constants.CART_ACTIVITY;
 import static com.wizo.smartcheckout.constant.constants.LOCATION_ACCURACY_LIMIT;
-import static com.wizo.smartcheckout.constant.constants.PAYMENTSUCCESS_ACTIVITY;
 import static com.wizo.smartcheckout.constant.constants.RC_CHECK_SETTING;
 import static com.wizo.smartcheckout.constant.constants.RC_LOCATION_PERMISSION;
 import static com.wizo.smartcheckout.constant.constants.RC_SCAN_BARCODE_STORE;
+import static com.wizo.smartcheckout.constant.constants.RECEIPT_ACTIVITY;
 import static com.wizo.smartcheckout.constant.constants.STORESELECTION_ACTIVITY;
 import static com.wizo.smartcheckout.constant.constants.TRANSACTION_UPDATE_EP;
 
@@ -118,13 +92,7 @@ public class MainActivity extends AppCompatActivity
         TextView email = (TextView)header.findViewById(R.id.userEmail);
         name.setText(StateData.userName);
         email.setText(StateData.userEmail);
-//
-//        ImageView imageView = (ImageView) header.findViewById(R.id.userImage);
-//
-//        if(StateData.userImage != null)
-//            Glide.with(getApplicationContext())
-//                .load(StateData.userImage)
-//                .into(imageView);
+
 
         if(StateData.store == null)
             launchFragment(STORESELECTION_ACTIVITY);
@@ -133,19 +101,31 @@ public class MainActivity extends AppCompatActivity
         final int nextActivity = receivingIntent.getIntExtra("next_activity",0);
         if(nextActivity != 0)
         {
-            launchFragment(nextActivity);
+            launchFragment(nextActivity,null);
         }
 
     }
 
+
     public void launchFragment(final int fragmentId) {
+		launchFragment(fragmentId, null);
+	}
+
+    public void launchFragment(final int fragmentId, final Bundle bundle)
+    {
+
         Runnable mPendingRunnable = new Runnable() {
             @Override
             public void run() {
                 // update the main content by replacing fragments
                 Log.d("Intent received", fragmentId + "");
                 Fragment fragment = getHomeFragment(fragmentId);
+
                 Log.d("Loaded Fragment", "" + fragment);
+
+                if(bundle != null)
+                    fragment.setArguments(bundle);
+                Log.d("Loaded Fragment",""+fragment);
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
                         android.R.anim.fade_out);
@@ -158,6 +138,7 @@ public class MainActivity extends AppCompatActivity
             mHandler.post(mPendingRunnable);
         }
     }
+
 
              @Override
              public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -175,6 +156,7 @@ public class MainActivity extends AppCompatActivity
              
 
     @Override
+
     public void onStart() {
         super.onStart();
         locationRetryCount = 0;
@@ -185,7 +167,6 @@ public class MainActivity extends AppCompatActivity
         super.onStop();
         //stopLocationUpdates();
     }
-
 
     private Fragment getHomeFragment(int navItemIndex) {
         switch (navItemIndex) {
@@ -201,10 +182,11 @@ public class MainActivity extends AppCompatActivity
                 StoreSelectionFragment storeSelectionFragment = new StoreSelectionFragment();
                 return storeSelectionFragment;
 
-            case PAYMENTSUCCESS_ACTIVITY:
+            case RECEIPT_ACTIVITY:
                 // notifications fragment
-                PaymentSuccessFragment paymentSuccessFragment = new PaymentSuccessFragment();
+                ReceiptFragment paymentSuccessFragment = new ReceiptFragment();
                 return paymentSuccessFragment;
+
 
 //            case 4:
 //                // settings fragment
@@ -298,7 +280,9 @@ public class MainActivity extends AppCompatActivity
                         Log.d(TAG, "Update Transaction Successful");
                         StateData.transactionId = response.getString("trnsId");
                         Log.d(TAG, "Updated transaction id : " + StateData.transactionId);
-                        launchFragment(PAYMENTSUCCESS_ACTIVITY);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("TransactionId", StateData.transactionId);
+                        launchFragment(RECEIPT_ACTIVITY,bundle);
 
                     } catch (Exception e) {
                         // TODO: throw custom exception

@@ -430,6 +430,9 @@ public class StoreSelectionFragment extends Fragment implements FragmentCompat.O
             long minute_diff = CommonUtils.getDifferenceinMinutes(lastTransactionDate, CommonUtils.getCurrentDate());
             Log.d("tag", "last pending transaction in " + minute_diff);
             String status = SharedPreferrencesUtil.getStringPreference(getActivity(), "TransactionStatus");
+
+            Log.d("tag", "last pending transaction status is " + status);
+
             if (minute_diff < TIMEOUT_TRANSACTION_MINS && status != null
                     && (status.equalsIgnoreCase(TransactionStatus.SUSPENDED.name()))) {
                 ongoingTransaction = SharedPreferrencesUtil.getStringPreference(getActivity(),"TransactionId");
@@ -441,8 +444,8 @@ public class StoreSelectionFragment extends Fragment implements FragmentCompat.O
 
 
     private void launchCartActivity(){
-        String transactionId = checkAndRetrieveOngoingTransaction();
-        if(transactionId!= null){
+       final String transactionId = checkAndRetrieveOngoingTransaction();
+        if(transactionId!= null ){
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                         getActivity(),R.style.DialogTheme);
 
@@ -452,7 +455,8 @@ public class StoreSelectionFragment extends Fragment implements FragmentCompat.O
                         .setCancelable(false)
                         .setPositiveButton(R.string.continue_transaction,new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,int id) {
-                                ((MainActivity)getActivity()).launchFragment(CART_ACTIVITY);
+                                StateData.transactionId = transactionId;
+                                ((MainActivity)getActivity()).launchFragment(CART_ACTIVITY,null);
 
                             }
                         })
@@ -460,7 +464,7 @@ public class StoreSelectionFragment extends Fragment implements FragmentCompat.O
                             public void onClick(DialogInterface dialog,int id) {
                                 StateData.transactionId = null;
                                 SharedPreferrencesUtil.setStringPreference(getContext(),SP_TRANSACTION_ID, null);
-                                ((MainActivity)getActivity()).launchFragment(CART_ACTIVITY);
+                                ((MainActivity)getActivity()).launchFragment(CART_ACTIVITY,null);
 
                             }
                         });

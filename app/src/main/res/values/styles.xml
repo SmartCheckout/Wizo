@@ -22,8 +22,8 @@
         <item name="colorPrimary">@color/colorPrimaryDark</item>
     </style>
     <style name="BarcodeEditText" parent="Theme.AppCompat.Light">
-        <item name="colorControlNormal">@color/indigo</item>
-        <item name="colorControlActivated">@color/pink</item>
+        <item name="colorControlNormal">@color/colorPrimaryDark</item>
+        <item name="colorControlActivated">@color/colorPrimaryDark</item>
         <item name="android:windowIsTranslucent">true</item>
     </style>
     <style name="smallTextFixedLen" parent="@style/TextAppearance.AppCompat.Small">
@@ -39,9 +39,8 @@
     </style>
 
     <style name="Divider">
-        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">1dp</item>
-
         <item name="android:background">?android:attr/listDivider</item>
     </style>
 

@@ -29,26 +29,42 @@ dependencies {
         androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
             exclude group: 'com.android.support', module: 'support-annotations'
         })
-        //Dependencies for Oauth login using firebase
-        //Dependencies for storage and loading of produc timages
 
+        // android support libs
         compile 'com.android.support:appcompat-v7:27.0.2'
-        compile 'com.android.support:support-v13:27.0.0'
+        compile 'com.android.support:support-v13:27.0.2'
         compile 'com.android.support:design:27.0.2'
+        compile 'com.android.support.constraint:constraint-layout:1.0.2'
+
+        // Google play services
         compile 'com.google.android.gms:play-services-vision:11.8.0'
         compile 'com.google.android.gms:play-services-places:11.8.0'
+        compile 'com.google.android.gms:play-services-location:11.8.0'
+
+        // Google Firebase
         compile 'com.google.firebase:firebase-auth:11.8.0'
-        compile 'com.firebaseui:firebase-ui-auth:3.2.1'
         compile 'com.google.firebase:firebase-storage:11.8.0'
         compile 'com.firebaseui:firebase-ui-storage:3.2.1'
-        compile 'com.github.bumptech.glide:glide:3.5.2'
-        compile 'com.google.android.gms:play-services-location:11.8.0'
-        compile 'com.loopj.android:android-async-http:1.4.9'
-        compile 'com.android.support.constraint:constraint-layout:1.0.2'
+        compile 'com.firebaseui:firebase-ui-auth:3.2.1'
+
+        compile 'com.google.code.gson:gson:2.8.2'
+
+        // third party libs
         compile 'com.razorpay:checkout:1.4.0'
         compile 'com.github.kenglxn.QRGen:android:2.3.0'
+        compile 'com.github.bumptech.glide:glide:3.5.2'
+        compile 'com.loopj.android:android-async-http:1.4.9'
         testCompile 'junit:junit:4.12'
-            compile 'com.google.code.gson:gson:2.8.2'
+
+        // Firebase ui dependency
+        // Required only if Facebook login support is required
+        // Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
+        implementation 'com.facebook.android:facebook-login:4.28.0'
+
+        // Required only if Twitter login support is required
+        // Find the latest Twitter SDK releases here: https://goo.gl/E5wZvQ
+        //implementation("com.twitter.sdk.android:twitter-core:3.2.0@aar") { transitive = true }
+
     }
 
 apply plugin: 'com.google.gms.google-services'

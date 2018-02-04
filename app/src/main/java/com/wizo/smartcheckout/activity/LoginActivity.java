@@ -60,8 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                                         .setIsSmartLockEnabled(!BuildConfig.DEBUG)
                                         .setProviders(Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
                                                 new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build(),
-                                                new AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build(),
-                                                new AuthUI.IdpConfig.Builder(AuthUI.TWITTER_PROVIDER).build()))
+                                                new AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build()))
                                         .setTheme(R.style.AppTheme)
                                         .build(),
                                 RC_SIGN_IN);

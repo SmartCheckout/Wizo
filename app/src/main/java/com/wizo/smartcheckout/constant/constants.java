@@ -29,8 +29,7 @@ public class constants {
 
     public final static int CART_ACTIVITY = 1;
     public final static int STORESELECTION_ACTIVITY = 2;
-    public final static int PAYMENTSUCCESS_ACTIVITY = 3;
-
+    public final static int RECEIPT_ACTIVITY = 3;
 
 
     public static int TIMEOUT_TRANSACTION_MINS = 100;

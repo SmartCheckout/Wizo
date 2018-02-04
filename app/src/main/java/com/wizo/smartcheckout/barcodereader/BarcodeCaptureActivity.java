@@ -165,7 +165,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
                 builder.show();
 
             }
-        }).setActionTextColor(getResources().getColor(R.color.pink));
+        }).setActionTextColor(getResources().getColor(R.color.colorPrimaryDark));
 
         cameraTimeout = new CountDownTimer(TIMEOUT_SCAN_MILLISECS, 1000) {
 
@@ -212,7 +212,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
         findViewById(R.id.topLayout).setOnClickListener(listener);
         Snackbar.make(mGraphicOverlay, R.string.permission_camera_rationale,
                 Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.ok, listener)
+                .setAction(R.string.ok, listener).setActionTextColor(getResources().getColor(R.color.colorPrimaryDark))
                 .show();
     }
 

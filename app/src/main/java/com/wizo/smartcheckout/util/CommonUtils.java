@@ -55,6 +55,16 @@ public class CommonUtils {
         return true;
     }
 
+
+
+
+    public static boolean isTransactionComplete()
+    {
+        if(StateData.status == TransactionStatus.INITIATED || StateData.status == TransactionStatus.CHECKOUT || StateData.status == TransactionStatus.SUSPENDED || StateData.status == TransactionStatus.PAYMENT_FAILURE)
+            return false;
+
+        return true;
+    }
     public static int getScreenWidth(Activity ctx)
     {
         Display display = ctx.getWindowManager().getDefaultDisplay();
@@ -66,14 +76,15 @@ public class CommonUtils {
 
     }
 
-
-    public static boolean isTransactionComplete()
+    public static int getScreenHeight(Activity ctx)
     {
-        if(StateData.status == TransactionStatus.INITIATED || StateData.status == TransactionStatus.CHECKOUT || StateData.status == TransactionStatus.SUSPENDED || StateData.status == TransactionStatus.PAYMENT_FAILURE)
-            return false;
+        Display display = ctx.getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
 
-        return true;
+        float density  = ctx.getResources().getDisplayMetrics().density;
+        return Math.round(outMetrics.heightPixels );
+
     }
-
 
 }
