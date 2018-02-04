@@ -172,48 +172,7 @@ public class MainActivity extends AppCompatActivity
 
                  }
              }
-
-             /**
-     * Utility Method to enable location settings
-     *
-     * */
-//    public void enableLocationSettings(){
-//
-//        LocationRequest request = new LocationRequest()
-//                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-//                //Set Interval and Set Fastest Interval
-//        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(request);
-//
-//        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
-//        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-//            //Location Setting Result Handler
-//            @Override
-//            public void onResult(LocationSettingsResult result) {
-//                final Status status = result.getStatus();
-//                switch (status.getStatusCode()) {
-//                    case LocationSettingsStatusCodes.SUCCESS:
-//                        locationEnabled = true;
-//                        //startLocationUpdates();
-//                        break;
-//                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-//                        try {
-//                            status.startResolutionForResult(MainActivity.this,RC_CHECK_SETTING);
-//                        } catch (IntentSender.SendIntentException e) {
-//                            // Ignore the error.
-//                            Log.d(TAG,e.getLocalizedMessage());
-//                        }
-//                        break;
-//                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-//                        System.out.println("Resolution not possible");
-//                        stopLocationUpdates();
-//                        launchFragment(STORESELECTION_ACTIVITY);
-//                        break;
-//                }
-//            }
-//        });
-//
-//    }
-
+             
 
     @Override
     public void onStart() {
