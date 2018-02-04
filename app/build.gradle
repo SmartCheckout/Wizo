@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 27
     defaultConfig {
         applicationId "com.wizo.smartcheckout"
         minSdkVersion 21
-        targetSdkVersion 25
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -32,21 +32,23 @@ dependencies {
         //Dependencies for Oauth login using firebase
         //Dependencies for storage and loading of produc timages
 
-    compile 'com.android.support:appcompat-v7:25.1.1'
-    compile 'com.android.support:design:25.1.1'
-        compile 'com.google.android.gms:play-services-vision:10.2.0'
-        compile 'com.google.android.gms:play-services-places:10.2.0'
-        compile 'com.google.firebase:firebase-auth:10.2.0'
-        compile 'com.firebaseui:firebase-ui-auth:1.2.0'
-        compile 'com.google.firebase:firebase-storage:10.2.0'
-        compile 'com.firebaseui:firebase-ui-storage:1.2.0'
+        compile 'com.android.support:appcompat-v7:27.0.2'
+        compile 'com.android.support:support-v13:27.0.0'
+        compile 'com.android.support:design:27.0.2'
+        compile 'com.google.android.gms:play-services-vision:11.8.0'
+        compile 'com.google.android.gms:play-services-places:11.8.0'
+        compile 'com.google.firebase:firebase-auth:11.8.0'
+        compile 'com.firebaseui:firebase-ui-auth:3.2.1'
+        compile 'com.google.firebase:firebase-storage:11.8.0'
+        compile 'com.firebaseui:firebase-ui-storage:3.2.1'
         compile 'com.github.bumptech.glide:glide:3.5.2'
-        compile 'com.google.android.gms:play-services-location:10.2.0'
+        compile 'com.google.android.gms:play-services-location:11.8.0'
         compile 'com.loopj.android:android-async-http:1.4.9'
         compile 'com.android.support.constraint:constraint-layout:1.0.2'
         compile 'com.razorpay:checkout:1.4.0'
         compile 'com.github.kenglxn.QRGen:android:2.3.0'
         testCompile 'junit:junit:4.12'
+            compile 'com.google.code.gson:gson:2.8.2'
     }
 
 apply plugin: 'com.google.gms.google-services'

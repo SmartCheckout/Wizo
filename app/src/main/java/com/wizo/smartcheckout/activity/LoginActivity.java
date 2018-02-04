@@ -13,7 +13,7 @@ import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.ResultCodes;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.wizo.smartcheckout.BuildConfig;
+import com.firebase.ui.auth.BuildConfig;
 import com.wizo.smartcheckout.R;
 import com.wizo.smartcheckout.util.CommonUtils;
 import com.wizo.smartcheckout.util.StateData;

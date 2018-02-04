@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 
 import com.wizo.smartcheckout.R;
+import com.wizo.smartcheckout.activity.MainActivity;
 import com.wizo.smartcheckout.model.CartItem;
 import com.wizo.smartcheckout.model.Product;
 import com.wizo.smartcheckout.model.Weight;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.facebook.FacebookSdk.getApplicationContext;
 import static com.wizo.smartcheckout.constant.constants.SPINNER_MAX_VALUE;
 
 /**
@@ -170,7 +170,7 @@ public class CartListViewAdapter extends BaseAdapter {
 
                 //Set attributes for quantity here so that they are also cached by viewHolder
                 viewHolder.quantity = (Spinner) view.findViewById(R.id.quantity);
-                viewHolder.quantityAdapter = new ArrayAdapter<Integer>(getApplicationContext(), R.layout.spinner_item, quantList);
+                viewHolder.quantityAdapter = new ArrayAdapter<Integer>(this.context, R.layout.spinner_item, quantList);
                 // Specify the layout to use when the list of choices appears
                 viewHolder.quantityAdapter.setDropDownViewResource(R.layout.spinner_drop_down);
                 viewHolder.quantity.setAdapter(viewHolder.quantityAdapter);

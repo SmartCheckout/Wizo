@@ -43,4 +43,6 @@ public class constants {
     public static String SP_TRANSACTION_STATUS="TransactionStatus";
 
     public static int TRANSACTION_LIST_SIZE =5;
+
+    public static int LOCATION_ACCURACY_LIMIT = 100;
 }

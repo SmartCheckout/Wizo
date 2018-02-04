@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.media.SyncParams;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -24,19 +25,29 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.razorpay.PaymentResultListener;
@@ -55,16 +66,18 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static com.wizo.smartcheckout.constant.constants.CART_ACTIVITY;
+import static com.wizo.smartcheckout.constant.constants.LOCATION_ACCURACY_LIMIT;
 import static com.wizo.smartcheckout.constant.constants.PAYMENTSUCCESS_ACTIVITY;
 import static com.wizo.smartcheckout.constant.constants.RC_CHECK_SETTING;
 import static com.wizo.smartcheckout.constant.constants.RC_LOCATION_PERMISSION;
+import static com.wizo.smartcheckout.constant.constants.RC_SCAN_BARCODE_STORE;
 import static com.wizo.smartcheckout.constant.constants.STORESELECTION_ACTIVITY;
 import static com.wizo.smartcheckout.constant.constants.TRANSACTION_UPDATE_EP;
 
 
 public class MainActivity extends AppCompatActivity
-        implements PaymentResultListener, NavigationView.OnNavigationItemSelectedListener,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ActivityCompat.OnRequestPermissionsResultCallback, LocationListener {
+        implements PaymentResultListener, NavigationView.OnNavigationItemSelectedListener
+         {
     // tags used to attach the fragments
     private static final String TAG_HOME = "home";
     private static final String TAG_PHOTOS = "photos";
@@ -76,9 +89,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = "MainActivity";
 
-    /* Location related variabled */
-    private GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
+
     private boolean locationEnabled = false;
     private int locationRetryCount = 0;
     private int locationRetryLimit = 5;
@@ -116,7 +127,7 @@ public class MainActivity extends AppCompatActivity
 //                .into(imageView);
 
         if(StateData.store == null)
-        connectGoogleApiClient();
+            launchFragment(STORESELECTION_ACTIVITY);
 
         final Intent receivingIntent = getIntent();
         final int nextActivity = receivingIntent.getIntExtra("next_activity",0);
@@ -127,19 +138,18 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public void launchFragment(final int fragmentId)
-    {
+    public void launchFragment(final int fragmentId) {
         Runnable mPendingRunnable = new Runnable() {
             @Override
             public void run() {
                 // update the main content by replacing fragments
-                Log.d("Intent received",fragmentId+"");
+                Log.d("Intent received", fragmentId + "");
                 Fragment fragment = getHomeFragment(fragmentId);
-                Log.d("Loaded Fragment",""+fragment);
+                Log.d("Loaded Fragment", "" + fragment);
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
                         android.R.anim.fade_out);
-                fragmentTransaction.replace(R.id.content_layout, fragment, CURRENT_TAG);
+                fragmentTransaction.replace(R.id.content_layout, fragment, String.valueOf(fragmentId));
                 fragmentTransaction.commitAllowingStateLoss();
             }
         };
@@ -149,104 +159,62 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void connectGoogleApiClient() {
-        System.out.println("In connectGoogleApiClient()");
+             @Override
+             public void onActivityResult(int requestCode, int resultCode, Intent data) {
+                 super.onActivityResult(requestCode, resultCode, data);
+                 switch (requestCode) {
+                     case RC_CHECK_SETTING:
+                         // Response from location enabled
+                         Fragment frg = getSupportFragmentManager().findFragmentByTag(String.valueOf(STORESELECTION_ACTIVITY));
+                         if (frg != null) {
+                             frg.onActivityResult(requestCode, resultCode, data);
+                         }
 
-        if (mGoogleApiClient == null) {
-            System.out.println("GoogleApiClient null....Creating client");
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
-        //Connect the google API client
-        System.out.println("GoogleApiClient not null");
-        mGoogleApiClient.connect();
-        System.out.println("Connection done");
+                 }
+             }
 
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        System.out.println("In on Connected() --> Google APi client");
-        mLocationRequest = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(2000)
-                .setFastestInterval(1000);
-        startLocationUpdates();
-    }
-
-    public void startLocationUpdates(){
-
-        if(locationEnabled){
-
-            if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-
-                String[] requiredPermission = {ACCESS_FINE_LOCATION};
-                ActivityCompat.requestPermissions(this,requiredPermission,RC_LOCATION_PERMISSION);
-            }else {
-                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-            }
-
-        }else{
-            enableLocationSettings();
-        }
-    }
-
-    /**
+             /**
      * Utility Method to enable location settings
      *
      * */
-    public void enableLocationSettings(){
+//    public void enableLocationSettings(){
+//
+//        LocationRequest request = new LocationRequest()
+//                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+//                //Set Interval and Set Fastest Interval
+//        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(request);
+//
+//        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
+//        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+//            //Location Setting Result Handler
+//            @Override
+//            public void onResult(LocationSettingsResult result) {
+//                final Status status = result.getStatus();
+//                switch (status.getStatusCode()) {
+//                    case LocationSettingsStatusCodes.SUCCESS:
+//                        locationEnabled = true;
+//                        //startLocationUpdates();
+//                        break;
+//                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+//                        try {
+//                            status.startResolutionForResult(MainActivity.this,RC_CHECK_SETTING);
+//                        } catch (IntentSender.SendIntentException e) {
+//                            // Ignore the error.
+//                            Log.d(TAG,e.getLocalizedMessage());
+//                        }
+//                        break;
+//                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+//                        System.out.println("Resolution not possible");
+//                        stopLocationUpdates();
+//                        launchFragment(STORESELECTION_ACTIVITY);
+//                        break;
+//                }
+//            }
+//        });
+//
+//    }
 
-        LocationRequest request = new LocationRequest().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(request);
 
-        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-            //Location Setting Result Handler
-            @Override
-            public void onResult(LocationSettingsResult result) {
-                final Status status = result.getStatus();
-                switch (status.getStatusCode()) {
-                    case LocationSettingsStatusCodes.SUCCESS:
-                        locationEnabled = true;
-                        startLocationUpdates();
-                        break;
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        try {
-                            status.startResolutionForResult(MainActivity.this,RC_CHECK_SETTING);
-                        } catch (IntentSender.SendIntentException e) {
-                            // Ignore the error.
-                            Log.d(TAG,e.getLocalizedMessage());
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        System.out.println("Resolution not possible");
-                        stopLocationUpdates();
-                        launchFragment(STORESELECTION_ACTIVITY);
-                        break;
-                }
-            }
-        });
-
-    }
-
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        System.out.println("In on ConnectionFailed() --> Google APi client");
-        stopLocationUpdates();
-        launchFragment(STORESELECTION_ACTIVITY);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        System.out.println("In on ConnectionSuspended() --> Google APi client");
-        stopLocationUpdates();
-        launchFragment(STORESELECTION_ACTIVITY);
-    }
     @Override
     public void onStart() {
         super.onStart();
@@ -256,73 +224,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStop() {
         super.onStop();
-        stopLocationUpdates();
+        //stopLocationUpdates();
     }
 
-    private void stopLocationUpdates()
-    {
-        if(mGoogleApiClient!=null && mGoogleApiClient.isConnected()){
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-            mGoogleApiClient.disconnect();
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Bundle bundle = data.getExtras();
-        switch (requestCode) {
-            case RC_CHECK_SETTING: // Response from location enabled
-                switch (resultCode) {
-                    case RESULT_OK:
-                        locationEnabled = true;
-                        startLocationUpdates();
-                        break;
-                    case RESULT_CANCELED:
-                        stopLocationUpdates();
-                        launchFragment(STORESELECTION_ACTIVITY);
-                        break;
-                }
-                break;
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
-            case RC_LOCATION_PERMISSION:
-                if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    startLocationUpdates();
-                }
-                else  {
-                    stopLocationUpdates();
-                    launchFragment(STORESELECTION_ACTIVITY);
-                }
-        }
-    }
-
-    // Call back handler for receiving location updates
-    @Override
-    public void onLocationChanged(Location location) {
-
-        Log.d(TAG,"Location Update received. Accuracy : "+ location.getAccuracy());
-        System.out.println();
-        locationRetryCount++;
-        if(locationRetryCount <= locationRetryLimit){
-            if(location.getAccuracy() <100){
-                Log.d(TAG,"Accuracy lt 100. Invoking store selection by location");
-                StateData.location = location;
-                stopLocationUpdates();
-                launchFragment(STORESELECTION_ACTIVITY);
-            }else{
-                Log.d(TAG,"Accuracy gt 100. Defering store search by location.");
-            }
-        }else{
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, MainActivity.this);
-            stopLocationUpdates();
-            launchFragment(STORESELECTION_ACTIVITY);
-        }
-    }
 
     private Fragment getHomeFragment(int navItemIndex) {
         switch (navItemIndex) {
