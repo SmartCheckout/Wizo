@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:999360434103:android:e01c5bb393beb08a",
+        "mobilesdk_app_id": "1:999360434103:android:b0bcc5ef22719157",
         "android_client_info": {
-          "package_name": "com.smartcheckout.poc"
+          "package_name": "com.wizo.smartcheckout"
         }
       },
       "oauth_client": [
