@@ -94,6 +94,9 @@
         <string name="barcode_scanning_trouble">Having trouble scanning barcode?</string>
         <string name="barcode_manual_entry_btn">Enter manually</string>
 
-
+        <string name="share_message">Hey! Try this cool way to shop: google.playstore.link</string>
+    <string name="support_email">support-wizo@gmail.com"</string>
+    <string name="past_transactions">Past Transactions</string>
+    <string name="pending_transactions">Pending Transactions</string>
 
 </resources>

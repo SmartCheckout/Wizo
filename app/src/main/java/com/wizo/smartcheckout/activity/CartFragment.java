@@ -57,6 +57,8 @@ import cz.msebera.android.httpclient.HttpEntity;
 import cz.msebera.android.httpclient.entity.ContentType;
 import cz.msebera.android.httpclient.entity.StringEntity;
 
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 import static com.wizo.smartcheckout.R.drawable.app_icon;
 import static com.wizo.smartcheckout.constant.constants.PRODUCT_SEARCH_URL;
 import static com.wizo.smartcheckout.constant.constants.RC_SCAN_BARCODE_ITEM;
@@ -68,7 +70,7 @@ import static com.wizo.smartcheckout.constant.constants.TRANSACTION_UPDATE_EP;
 import static com.wizo.smartcheckout.constant.constants.TRANSACTION_URL;
 
 
-public class CartFragment extends Fragment implements PaymentResultListener {
+public class CartFragment extends WizoFragment implements PaymentResultListener {
 
     private TextView mTextMessage;
     private ListView cartListView;
@@ -78,9 +80,8 @@ public class CartFragment extends Fragment implements PaymentResultListener {
 
     //Floating action buttons
     private FloatingActionButton fabScan;
-    private Button fabCheckOut;
     private Button payButton;
-
+    private TextView itemCount;
     private AsyncHttpClient ahttpClient = new AsyncHttpClient();
     private CartListViewAdapter cartAdapter;
 
@@ -99,7 +100,8 @@ public class CartFragment extends Fragment implements PaymentResultListener {
         view = inflater.inflate(R.layout.activity_cart,container,false);
 
         // set pay button listener
-        payButton = (Button)view.findViewById(R.id.payButton);
+        payButton = view.findViewById(R.id.payButton);
+        itemCount =  view.findViewById(R.id.itemCount);
         payButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -187,7 +189,7 @@ public class CartFragment extends Fragment implements PaymentResultListener {
         else
             cartAdapter = new CartListViewAdapter(getActivity(),cartList);
         //Link the cartList and the adapter
-        cartListView = (ListView) view.findViewById(R.id.cartList);
+        cartListView =  view.findViewById(R.id.cartList);
         cartListView.setAdapter(cartAdapter);
         cartAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
@@ -222,29 +224,30 @@ public class CartFragment extends Fragment implements PaymentResultListener {
             e.printStackTrace();
         }
     }
-//
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        Bundle bundle = data.getExtras();
-//        switch (requestCode) {
-//            case RC_SCAN_BARCODE_ITEM:
-//                if (resultCode == RESULT_OK) {
-//                    String barcode = bundle.getString("Barcode");
-//                    if(barcode != null) {
-//                        System.out.println("=====> Control returned from Scan Barcode Activity. Barcode : " + barcode);
-//                        handleBarcode(barcode);
-//                    }
-//                }
-//                else if(resultCode == RESULT_CANCELED )
-//                {
-//                    String reason = bundle.getString("Reason");
-//                    if(reason != null && reason.equalsIgnoreCase("Timeout"))
-//                        Toast.makeText(this,getResources().getString(R.string.toast_scan_timedout),Toast.LENGTH_LONG).show();
-//                }
-//                break;
-//        }
-//    }
-//
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Bundle bundle = data.getExtras();
+        switch (requestCode) {
+            case RC_SCAN_BARCODE_ITEM:
+                if (resultCode == RESULT_OK) {
+                    String barcode = bundle.getString("Barcode");
+                    if(barcode != null) {
+                        System.out.println("=====> Control returned from Scan Barcode Activity. Barcode : " + barcode);
+                        // TODO: Change it to backend later
+                        populateDummyScanProd();
+                    }
+                }
+                else if(resultCode == RESULT_CANCELED )
+                {
+                    String reason = bundle.getString("Reason");
+                    if(reason != null && reason.equalsIgnoreCase("Timeout"))
+                        Toast.makeText(getActivity(),getResources().getString(R.string.toast_scan_timedout),Toast.LENGTH_LONG).show();
+                }
+                break;
+        }
+    }
+
 
 
     public void calculateBill() {
@@ -262,8 +265,16 @@ public class CartFragment extends Fragment implements PaymentResultListener {
     public void updateAndShowBill(){
         calculateBill();
         payButton.setText(getResources().getString(R.string.pay_button)+bill.getTotal());
-        if(payButton.getVisibility() == View.INVISIBLE)
+        itemCount.setText(String.valueOf(cartAdapter.getItemCount()));
+        if(cartAdapter.getItemCount() == 0)
+        {
+            payButton.setVisibility(View.INVISIBLE);
+        }
+        else
+            if(payButton.getVisibility() == View.INVISIBLE)
+        {
             payButton.setVisibility(View.VISIBLE);
+        }
 
     }
 
@@ -271,16 +282,12 @@ public class CartFragment extends Fragment implements PaymentResultListener {
         emulatorCounter++;
         System.out.println("In launchBarcodeScanner");
         //Launch the bar scanner activity
-        /*Intent barcodeScanIntent = new Intent(this,ScanBarcodeActivity.class);
+        Intent barcodeScanIntent = new Intent(getActivity(),BarcodeCaptureActivity.class);
         barcodeScanIntent.putExtra("requestCode",RC_SCAN_BARCODE_ITEM);
-        startActivityForResult(barcodeScanIntent,RC_SCAN_BARCODE_ITEM); */
-
-//        Intent barcodeScanIntent = new Intent(this,BarcodeCaptureActivity.class);
-//        barcodeScanIntent.putExtra("requestCode",RC_SCAN_BARCODE_ITEM);
-//        startActivityForResult(barcodeScanIntent,RC_SCAN_BARCODE_ITEM);
+        startActivityForResult(barcodeScanIntent,RC_SCAN_BARCODE_ITEM);
 
         //Bypassing scan activity to directly hit the service and get dummy data. Should remove this portion in actual app
-        populateDummyScanProd();
+       // populateDummyScanProd();
     }
 
     public JSONArray getCart() throws JSONException {
@@ -426,6 +433,15 @@ public class CartFragment extends Fragment implements PaymentResultListener {
                     e.printStackTrace();
                 }
             }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                System.out.println("Failed to fetch product");
+
+            }
+
+
         });
 
 
@@ -575,6 +591,12 @@ public class CartFragment extends Fragment implements PaymentResultListener {
 //        Log.e(TAG,response);
 //
 //        launchCartActivity();
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        // Do Nothing
     }
 
 }

@@ -5,6 +5,7 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.media.SyncParams;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -19,11 +20,17 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.razorpay.PaymentResultListener;
@@ -34,18 +41,22 @@ import com.wizo.smartcheckout.util.TransactionStatus;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Date;
+
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.ContentType;
 import cz.msebera.android.httpclient.entity.StringEntity;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static com.wizo.smartcheckout.constant.constants.CART_ACTIVITY;
+import static com.wizo.smartcheckout.constant.constants.COMING_SOON_PAGE;
 import static com.wizo.smartcheckout.constant.constants.LOCATION_ACCURACY_LIMIT;
 import static com.wizo.smartcheckout.constant.constants.RC_CHECK_SETTING;
 import static com.wizo.smartcheckout.constant.constants.RC_LOCATION_PERMISSION;
 import static com.wizo.smartcheckout.constant.constants.RC_SCAN_BARCODE_STORE;
 import static com.wizo.smartcheckout.constant.constants.RECEIPT_ACTIVITY;
 import static com.wizo.smartcheckout.constant.constants.STORESELECTION_ACTIVITY;
+import static com.wizo.smartcheckout.constant.constants.TRANSACTION_SUMMARY_ACTIVITY;
 import static com.wizo.smartcheckout.constant.constants.TRANSACTION_UPDATE_EP;
 
 
@@ -54,19 +65,13 @@ public class MainActivity extends AppCompatActivity
          {
     // tags used to attach the fragments
     private static final String TAG_HOME = "home";
-    private static final String TAG_PHOTOS = "photos";
-    private static final String TAG_MOVIES = "movies";
-    private static final String TAG_NOTIFICATIONS = "notifications";
-    private static final String TAG_SETTINGS = "settings";
-    public static String CURRENT_TAG = TAG_HOME;
+
     private Handler mHandler;
 
     private static final String TAG = "MainActivity";
 
+    private WizoFragment currentFragment;
 
-    private boolean locationEnabled = false;
-    private int locationRetryCount = 0;
-    private int locationRetryLimit = 5;
 
     private AsyncHttpClient ahttpClient = new AsyncHttpClient();
 
@@ -75,21 +80,21 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mHandler = new Handler();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer =  findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         View header=navigationView.getHeaderView(0);
-        TextView name = (TextView)header.findViewById(R.id.userName);
-        TextView email = (TextView)header.findViewById(R.id.userEmail);
+        TextView name = header.findViewById(R.id.userName);
+        TextView email =header.findViewById(R.id.userEmail);
         name.setText(StateData.userName);
         email.setText(StateData.userEmail);
 
@@ -119,17 +124,20 @@ public class MainActivity extends AppCompatActivity
             public void run() {
                 // update the main content by replacing fragments
                 Log.d("Intent received", fragmentId + "");
-                Fragment fragment = getHomeFragment(fragmentId);
-
+                WizoFragment fragment = getHomeFragment(fragmentId);
+                currentFragment = fragment;
                 Log.d("Loaded Fragment", "" + fragment);
+
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
                 if(bundle != null)
                     fragment.setArguments(bundle);
-                Log.d("Loaded Fragment",""+fragment);
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+
+
+                fragmentTransaction.replace(R.id.content_layout, fragment, String.valueOf(fragmentId));
+
                 fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
                         android.R.anim.fade_out);
-                fragmentTransaction.replace(R.id.content_layout, fragment, String.valueOf(fragmentId));
                 fragmentTransaction.commitAllowingStateLoss();
             }
         };
@@ -138,7 +146,6 @@ public class MainActivity extends AppCompatActivity
             mHandler.post(mPendingRunnable);
         }
     }
-
 
              @Override
              public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -150,7 +157,12 @@ public class MainActivity extends AppCompatActivity
                          if (frg != null) {
                              frg.onActivityResult(requestCode, resultCode, data);
                          }
-
+                         break;
+                     case RC_SCAN_BARCODE_STORE:
+                         Fragment frg1 = getSupportFragmentManager().findFragmentByTag(String.valueOf(CART_ACTIVITY));
+                         if (frg1 != null) {
+                             frg1.onActivityResult(requestCode, resultCode, data);
+                         }
                  }
              }
              
@@ -159,41 +171,33 @@ public class MainActivity extends AppCompatActivity
 
     public void onStart() {
         super.onStart();
-        locationRetryCount = 0;
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        //stopLocationUpdates();
     }
 
-    private Fragment getHomeFragment(int navItemIndex) {
+    private WizoFragment getHomeFragment(int navItemIndex) {
         switch (navItemIndex) {
 
 
             case CART_ACTIVITY:
-                // photos
                 CartFragment cartFragment = new CartFragment();
                 return cartFragment;
 
             case STORESELECTION_ACTIVITY:
-                // movies fragment
                 StoreSelectionFragment storeSelectionFragment = new StoreSelectionFragment();
                 return storeSelectionFragment;
 
             case RECEIPT_ACTIVITY:
-                // notifications fragment
                 ReceiptFragment paymentSuccessFragment = new ReceiptFragment();
                 return paymentSuccessFragment;
 
+            case TRANSACTION_SUMMARY_ACTIVITY:
+                TransactionSummaryFragment transactionSummaryFragment = new TransactionSummaryFragment();
+                return transactionSummaryFragment;
 
-//            case 4:
-//                // settings fragment
-//                SettingsFragment settingsFragment = new SettingsFragment();
-//                return settingsFragment;
-//            default:
-//                return new HomeFragment();
         }
 
         return null;
@@ -201,16 +205,20 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        currentFragment.onBackPressed();
+
+        DrawerLayout drawer =  findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         }
+
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -235,17 +243,58 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_shopnow) {
+            FrameLayout frame =  findViewById(R.id.content_layout);
+            frame.removeAllViews();
+            launchFragment(CART_ACTIVITY);
 
-        } else if (id == R.id.nav_slideshow) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_search) {
+            FrameLayout frame =  findViewById(R.id.content_layout);
+            frame.removeAllViews();
+            LayoutInflater.from(getApplicationContext()).inflate(R.layout.coming_soon, frame, true);
 
+
+        } else if (id == R.id.nav_transactions) {
+
+            FrameLayout frame =  findViewById(R.id.content_layout);
+            frame.removeAllViews();
+            Bundle inputBundle = new Bundle();
+            inputBundle.putBoolean("cache",false);
+            launchFragment(TRANSACTION_SUMMARY_ACTIVITY,inputBundle);
+        } else if (id == R.id.nav_offers) {
+            FrameLayout frame =  findViewById(R.id.content_layout);
+            frame.removeAllViews();
+            LayoutInflater.from(getApplicationContext()).inflate(R.layout.coming_soon, frame, true);
         } else if (id == R.id.nav_share) {
 
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT,getResources().getString(R.string.share_message));
+            sendIntent.setType("text/plain");
+            startActivity(sendIntent);
+
         } else if (id == R.id.nav_send) {
+
+            Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+            sendIntent.setType("plain/text");
+            sendIntent.setData(Uri.parse(getResources().getString(R.string.support_email)));
+            sendIntent.setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail");
+            sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Customer Feedback - "+new Date());
+            startActivity(sendIntent);
+
+        } else if (id == R.id.nav_signout) {
+            StateData.store = null;
+            StateData.storeId = null;
+            StateData.storeName = null;
+            AuthUI.getInstance()
+                    .signOut(MainActivity.this)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        public void onComplete(@NonNull Task<Void> task) {
+                            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                            finish();
+                        }
+                    });
 
         }
 
@@ -282,6 +331,8 @@ public class MainActivity extends AppCompatActivity
                         Log.d(TAG, "Updated transaction id : " + StateData.transactionId);
                         Bundle bundle = new Bundle();
                         bundle.putString("TransactionId", StateData.transactionId);
+                        bundle.putString("CallingView", "Cart");
+
                         launchFragment(RECEIPT_ACTIVITY,bundle);
 
                     } catch (Exception e) {

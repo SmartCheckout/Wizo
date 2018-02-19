@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/transaction_history_view"
+    >
+
+    <TextView
+        android:id="@+id/label_pending_transactions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="12dp"
+        android:text="@string/pending_transactions"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium.Inverse"
+        android:textStyle="bold"
+        android:background="@color/cardview_dark_background"
+        />
+
+    <ListView
+        android:id="@+id/pending_transaction_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></ListView>
+    <TextView
+        android:id="@+id/label_past_transactions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="12dp"
+        android:text="@string/past_transactions"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium.Inverse"
+        android:textStyle="bold"
+        android:background="@color/cardview_dark_background"
+        />
+    <ListView
+        android:id="@+id/past_transaction_list"
+        android:layout_width="match_parent"
+        android:scrollbars="vertical"
+        android:layout_height="wrap_content"
+        >
+    </ListView>
+
+</LinearLayout>

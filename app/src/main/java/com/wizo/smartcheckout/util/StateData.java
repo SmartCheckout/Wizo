@@ -6,6 +6,8 @@ import android.location.Location;
 import com.wizo.smartcheckout.model.Store;
 import com.wizo.smartcheckout.model.Transaction;
 
+import java.util.List;
+
 /**
  * Created by yeshwanth on 8/17/2017.
  */
@@ -24,4 +26,7 @@ public class StateData {
     public static Store store;
     public static Float billAmount = 0.0f;
     public static Location location = null;
+
+    public static List<Transaction> pendingTransactionList;
+    public static List<Transaction> pastTransactionList;
 }

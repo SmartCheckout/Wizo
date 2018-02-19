@@ -75,7 +75,7 @@ import static com.wizo.smartcheckout.constant.constants.TIMEOUT_TRANSACTION_MINS
  * Created by yeshwanth on 4/5/2017.
  */
 
-public class StoreSelectionFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback
+public class StoreSelectionFragment extends WizoFragment implements FragmentCompat.OnRequestPermissionsResultCallback
 {
     private View view;
     private Store selectedStore;
@@ -484,4 +484,10 @@ public class StoreSelectionFragment extends Fragment implements FragmentCompat.O
 
     // ----------------- END : BUSINESS LOGIC METHODS ------------ //
 
+
+    @Override
+    public void onBackPressed()
+    {
+        // Do Nothing
+    }
 }

@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 
 import com.wizo.smartcheckout.R;
-import com.wizo.smartcheckout.activity.MainActivity;
 import com.wizo.smartcheckout.model.CartItem;
 import com.wizo.smartcheckout.model.Product;
 import com.wizo.smartcheckout.model.Weight;
@@ -51,6 +50,7 @@ public class CartListViewAdapter extends BaseAdapter {
     private Double totalAmount = 0.0;
     private Double totalSavings = 0.0;
     private Double totalWeight = 0.0;
+    private int itemCount = 0;
 
     //Creates an adapter from an already defined list
     public CartListViewAdapter(Context context, List<CartItem> cartItemList) {
@@ -96,6 +96,7 @@ public class CartListViewAdapter extends BaseAdapter {
             // Updating the total amount and total savings of the contents of the cart
             totalAmount += cartItem.getQuantity() * currentProduct.getSellingPrice();
             totalSavings += cartItem.getQuantity()* currentProduct.getSavings();
+            itemCount += cartItem.getQuantity();
 
             if(currentProduct.getWeight().getUnit().equals(Weight.Unit.GM))
                 totalWeight += cartItem.getQuantity() * currentProduct.getWeight().getvalue() ;
@@ -111,6 +112,7 @@ public class CartListViewAdapter extends BaseAdapter {
             iteminCart.setQuantity(currentQty + qtyIncrease);
             totalAmount += qtyIncrease * currentProduct.getSellingPrice();
             totalSavings += qtyIncrease* currentProduct.getSavings();
+            itemCount += qtyIncrease;
 
             if(currentProduct.getWeight().getUnit().equals(Weight.Unit.GM))
                 totalWeight += qtyIncrease * currentProduct.getWeight().getvalue();
@@ -125,6 +127,8 @@ public class CartListViewAdapter extends BaseAdapter {
     public Double getTotalAmount(){return totalAmount;}
     public Double getTotalSavings(){return totalSavings;}
     public Double getTotalWeight(){ return totalWeight; }
+    public int getItemCount(){ return itemCount; }
+
 
     @Override
     public int getCount() {
@@ -210,7 +214,7 @@ public class CartListViewAdapter extends BaseAdapter {
                     int qtyDifference = newQuantity - item.getQuantity();
                     totalAmount += qtyDifference* currentProduct.getSellingPrice();
                     totalSavings += qtyDifference* currentProduct.getSavings();
-
+                    itemCount += qtyDifference;
                     if(currentProduct.getWeight().getUnit().equals(Weight.Unit.GM))
                         totalWeight += qtyDifference * currentProduct.getWeight().getvalue();
                     else
@@ -253,7 +257,7 @@ public class CartListViewAdapter extends BaseAdapter {
         Product currentProduct = cartItem.getProduct();
         totalSavings -= cartItem.getQuantity()*currentProduct.getSavings();
         totalAmount -= cartItem.getQuantity()*currentProduct.getSellingPrice();
-
+        itemCount -= cartItem.getQuantity();
         if(currentProduct.getWeight().getUnit().equals(Weight.Unit.GM))
             totalWeight -= cartItem.getQuantity() * currentProduct.getWeight().getvalue();
         else

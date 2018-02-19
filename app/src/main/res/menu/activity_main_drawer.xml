@@ -3,24 +3,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="all" android:id="@+id/mainMenu">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/nav_shopnow"
             android:icon="@drawable/ic_cart_black_48dp"
             android:title="Shop Now" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_search"
             android:icon="@drawable/ic_magnify_black_48dp"
             android:title="Search Product" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_transactions"
             android:icon="@drawable/ic_history_black_48dp"
             android:title="Transaction History" />
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/nav_offers"
             android:icon="@drawable/ic_gift_black_48dp"
             android:title="Offers" />
     </group>
+
+    <group android:checkableBehavior="single" android:id="@+id/communicate">
 
     <item android:title="Communicate">
         <menu>
@@ -31,8 +33,15 @@
             <item
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:title="Feedback" />
         </menu>
     </item>
+    </group>
 
+    <item
+        android:icon="@drawable/ic_exit_to_app_black_48dp"
+        android:id="@+id/nav_signout"
+        android:title="SignOut">
+
+    </item>
 </menu>

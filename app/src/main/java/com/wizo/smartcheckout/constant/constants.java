@@ -30,6 +30,8 @@ public class constants {
     public final static int CART_ACTIVITY = 1;
     public final static int STORESELECTION_ACTIVITY = 2;
     public final static int RECEIPT_ACTIVITY = 3;
+    public static final int COMING_SOON_PAGE = 4;
+    public static final int TRANSACTION_SUMMARY_ACTIVITY = 5;
 
 
     public static int TIMEOUT_TRANSACTION_MINS = 100;

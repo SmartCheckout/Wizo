@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -63,10 +64,12 @@ import static com.wizo.smartcheckout.constant.constants.SP_TRANSACTION_ID;
 import static com.wizo.smartcheckout.constant.constants.SP_TRANSACTION_STATUS;
 import static com.wizo.smartcheckout.constant.constants.SP_TRANSACTION_UPDATED_TS;
 import static com.wizo.smartcheckout.constant.constants.STORESELECTION_ACTIVITY;
+import static com.wizo.smartcheckout.constant.constants.TRANSACTION_SUMMARY_ACTIVITY;
+import static com.wizo.smartcheckout.constant.constants.TRANSACTION_UPDATE_EP;
 import static com.wizo.smartcheckout.constant.constants.TRANSACTION_URL;
 
 
-public class ReceiptFragment extends Fragment {
+public class ReceiptFragment extends WizoFragment {
 
     private static String TAG = "ReceiptFragment";
     private View view ;
@@ -78,6 +81,8 @@ public class ReceiptFragment extends Fragment {
     TextView totalView ;
     TextView savingsView;
     TextView storeNameView;
+
+    String callingView = null;
 
     private AsyncHttpClient ahttpClient = new AsyncHttpClient();
     @Override
@@ -98,38 +103,74 @@ public class ReceiptFragment extends Fragment {
          totalView = ((TextView) view.findViewById(R.id.totalVal));
          savingsView = ((TextView) view.findViewById(R.id.savingsVal));
         storeNameView = ((TextView) view.findViewById(R.id.storeName));
-
-
-        final String transactionId = getArguments().getString("TransactionId");
-
-
-
         Button shopAgain = (Button) view.findViewById(R.id.shopAgain);
 
-        shopAgain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                StateData.transactionReceipt = null;
-                StateData.transactionId = null;
-                ((MainActivity)getActivity()).launchFragment(STORESELECTION_ACTIVITY,null);
+        final String transactionId = getArguments().getString("TransactionId");
+        Button viewReciept =  view.findViewById(R.id.receipt);
 
-                SharedPreferrencesUtil.setStringPreference(getActivity(),SP_TRANSACTION_ID,null);
-                SharedPreferrencesUtil.setStringPreference(getActivity(),SP_TRANSACTION_STATUS, null);
 
+        this.callingView = getArguments().getString("CallingView");
+        if(callingView != null && callingView.equalsIgnoreCase("History"))
+        {
+            Log.i(TAG,"Restoring cached transaction");
+            shopAgain.setVisibility(View.GONE);
+            viewReciept.setVisibility(View.GONE);
+            Transaction cachedTransaction = null;
+            if(getArguments().getBoolean("isPending"))
+            {
+                for(Transaction transaction:StateData.pendingTransactionList)
+                {
+                    if(transaction.getTrnsId().equalsIgnoreCase(transactionId))
+                        cachedTransaction = transaction;
+
+                }
             }
-        });
+            else
+            {
+                for(Transaction transaction:StateData.pastTransactionList)
+                {
+                    if(transaction.getTrnsId().equalsIgnoreCase(transactionId))
+                        cachedTransaction = transaction;
 
-
-        Button viewReciept = (Button) view.findViewById(R.id.receipt);
-
-        viewReciept.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-            // TODO: Email Implementation
+                }
             }
-        });
+
+            if(cachedTransaction != null)
+            {
+                if(cachedTransaction.getCart() != null && cachedTransaction.getStore() != null && cachedTransaction.getBill() != null)
+                    restoreView(inflater,cachedTransaction.getTrnsId(),cachedTransaction.getCart(),cachedTransaction.getStore(),cachedTransaction.getBill(),new Date(cachedTransaction.getTrnsDate()));
+
+                return view;
+            }
+
+        }
+        else {
+
+            shopAgain.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    StateData.transactionReceipt = null;
+                    StateData.transactionId = null;
+                    ((MainActivity) getActivity()).launchFragment(STORESELECTION_ACTIVITY, null);
+
+                    SharedPreferrencesUtil.setStringPreference(getActivity(), SP_TRANSACTION_ID, null);
+                    SharedPreferrencesUtil.setStringPreference(getActivity(), SP_TRANSACTION_STATUS, null);
+
+                }
+            });
+
+
+
+            viewReciept.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+
+                    // TODO: Email Implementation
+                }
+            });
+
+        }
 
         myImage.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -257,5 +298,16 @@ public class ReceiptFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onBackPressed()
+    {
+        if(callingView.equalsIgnoreCase("History"))
+        {
+            Bundle inputBundle = new Bundle();
+            inputBundle.putBoolean("cache",true);
+            ((MainActivity)getActivity()).launchFragment(TRANSACTION_SUMMARY_ACTIVITY,inputBundle);
+
+        }
+    }
 
 }
