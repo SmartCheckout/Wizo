@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/billlayout"
+    >
+    <ImageView
+        android:id="@+id/trnsQRCode"
+        android:layout_width="148dp"
+        android:layout_height="150dp"
+        android:layout_alignParentLeft="true"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:src="@drawable/sample_qr"
+
+
+        />
+
+    <TextView
+        android:id="@+id/hintText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="@id/trnsQRCode"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:paddingTop="130dp"
+        android:text="Click to Zoom"
+
+
+        />
+
+    <TextView
+        android:id="@+id/amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="30dp"
+        android:text="@string/rupee"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        app:layout_constraintBottom_toTopOf="@id/status"
+        app:layout_constraintLeft_toRightOf="@id/trnsQRCode"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+
+        />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/payment_succesful"
+        android:textColor="@color/paymentNormal"
+        android:background="@drawable/payment_border"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/trnsQRCode"
+        app:layout_constraintTop_toBottomOf="@id/amount"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+
+        />
+    <TextView
+        android:id="@+id/storeName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Store Name"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/trnsQRCode"
+        app:layout_constraintTop_toBottomOf="@id/status"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+
+        />
+
+    <ListView
+        app:layout_constraintTop_toBottomOf="@+id/trnsQRCode"
+        android:id="@+id/cart_list"
+        android:scrollbars="vertical"
+        android:layout_height="200dp"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:layout_width="0dp"
+
+        >
+    </ListView>
+
+    <View style="@style/Divider"
+        app:layout_constraintTop_toBottomOf="@id/cart_list"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/subtotal"
+        android:layout_height="5dp"
+
+        />
+    <TextView
+        android:id="@+id/subtotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:paddingBottom="2dp"
+        android:paddingTop="10dp"
+        android:text="Subtotal"
+        android:textAllCaps="false"
+        android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintStart_toEndOf="@id/trnsQRCode"
+        app:layout_constraintTop_toBottomOf="@id/cart_list" />
+
+    <TextView
+        android:id="@+id/subtotalVal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingBottom="2dp"
+        android:paddingRight="32dp"
+        android:textColor="@color/colorAccent"
+        android:text="@string/rupee"
+        android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+        app:layout_constraintTop_toBottomOf="@id/cart_list"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/tax"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="32dp"
+        android:paddingBottom="5dp"
+        android:textColor="@color/colorAccent"
+        android:text="Tax"
+        android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+        app:layout_constraintEnd_toEndOf="@id/subtotal"
+        app:layout_constraintTop_toBottomOf="@id/subtotal"
+        />
+
+    <TextView
+        android:id="@+id/taxVal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:paddingRight="32dp"
+        android:textColor="@color/colorAccent"
+        android:text="@string/rupee"
+        android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+        app:layout_constraintTop_toBottomOf="@id/subtotal"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+    <View style="@style/Divider"
+        app:layout_constraintTop_toBottomOf="@id/tax"
+        app:layout_constraintStart_toEndOf="@id/trnsQRCode"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/total"
+        />
+
+    <TextView
+        android:id="@+id/total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="32dp"
+        android:paddingBottom="2dp"
+        android:textStyle="bold"
+        android:text="Total"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        app:layout_constraintEnd_toEndOf="@id/subtotal"
+        app:layout_constraintTop_toBottomOf="@id/tax"
+        />
+
+    <TextView
+        android:id="@+id/totalVal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="2dp"
+        android:paddingRight="32dp"
+        android:textColor="@color/colorAccent"
+        android:text="@string/rupee"
+        android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+        app:layout_constraintTop_toBottomOf="@id/tax"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/savings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="32dp"
+        android:paddingBottom="5dp"
+        android:text="Savings"
+        android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+        app:layout_constraintEnd_toEndOf="@id/subtotal"
+        app:layout_constraintTop_toBottomOf="@id/total"
+        />
+
+    <TextView
+        android:id="@+id/savingsVal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:paddingRight="32dp"
+        android:textColor="@color/colorAccent"
+        android:text="@string/rupee"
+        android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+        app:layout_constraintTop_toBottomOf="@id/total"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+    <View style="@style/Divider"
+        app:layout_constraintTop_toBottomOf="@id/savings"
+        />
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/savings"
+        >
+        <Button
+            android:id="@+id/shopAgain"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Shop Again"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/receipt"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            style="?android:attr/borderlessButtonStyle"
+            android:textColor="@color/colorPrimaryDark"
+            />
+
+        <View style="@style/VerticalDivider"
+            app:layout_constraintBottom_toTopOf="@id/endDivider"
+            app:layout_constraintLeft_toRightOf="@id/shopAgain"
+            app:layout_constraintRight_toLeftOf="@id/receipt"
+            />
+
+        <Button
+            android:id="@+id/receipt"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Email Receipt"
+            app:layout_constraintLeft_toRightOf="@id/shopAgain"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            style="?android:attr/borderlessButtonStyle"
+            />
+
+        <View style="@style/Divider"
+            android:id="@+id/endDivider"
+            app:layout_constraintTop_toBottomOf="@id/receipt"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginBottom="5dp"
+            />
+    </android.support.constraint.ConstraintLayout>
+
+
+
+</android.support.constraint.ConstraintLayout>
