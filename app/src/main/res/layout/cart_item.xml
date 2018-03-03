@@ -72,8 +72,8 @@
         android:layout_marginBottom="0dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="0dp"
+        style="@style/Widget.AppCompat.Spinner.DropDown"
         app:layout_constraintBottom_toBottomOf="@+id/sellingPrice"
         app:layout_constraintEnd_toStartOf="@+id/sellingPrice"
-        app:layout_constraintTop_toTopOf="@+id/sellingPrice"
-        tools:layout_editor_absoluteX="293dp" />
+        app:layout_constraintTop_toTopOf="@+id/sellingPrice" />
 </android.support.constraint.ConstraintLayout>

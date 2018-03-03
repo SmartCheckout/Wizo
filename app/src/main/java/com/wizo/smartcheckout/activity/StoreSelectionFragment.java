@@ -124,6 +124,7 @@ public class StoreSelectionFragment extends WizoFragment implements FragmentComp
             }
         });
 
+        storeSelectionMsg.setText(R.string.store_selection_permission_msg);
         enableLocation = (Button) view.findViewById(R.id.enableLocation);
         enableLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -415,6 +416,8 @@ public class StoreSelectionFragment extends WizoFragment implements FragmentComp
             }
         }else{
             stopLocationUpdates();
+            storeSelectionMsg.setText(R.string.store_not_found);
+            manageVisibiliy(SELECTION_ALL_OPTIONS);
         }
     }
     // ----------- END : LOCATION HELPER METHODS ---------- //

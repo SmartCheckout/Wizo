@@ -7,8 +7,11 @@ import android.net.NetworkInfo;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.widget.Toast;
+import android.graphics.Bitmap;
 
 import com.wizo.smartcheckout.R;
+
+import net.glxn.qrgen.android.QRCode;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -87,4 +90,10 @@ public class CommonUtils {
 
     }
 
+    public static Bitmap generateBitmap(String content, int foregroundColor, int backgroundColor){
+        return QRCode.from(content).withColor(foregroundColor, backgroundColor).bitmap();
+    }
+    public static Bitmap generateBitmap(String content, int foregroundColor, int backgroundColor, int width, int height){
+        return QRCode.from(content).withColor(foregroundColor, backgroundColor).withSize(width, height).bitmap();
+    }
 }

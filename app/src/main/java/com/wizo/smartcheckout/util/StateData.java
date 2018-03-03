@@ -28,5 +28,5 @@ public class StateData {
     public static Location location = null;
 
     public static List<Transaction> pendingTransactionList;
-    public static List<Transaction> pastTransactionList;
+    public static List<Transaction> approvedTransactionList;
 }

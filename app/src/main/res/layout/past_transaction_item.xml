@@ -3,53 +3,90 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="10dp"
-    >
+    android:layout_height="60dp">
 
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/storeName"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/detailedView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:padding="2dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_height="36dp"
+        android:layout_marginStart="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text="Target"></TextView>
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/billAmount"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="15dp"
-        android:padding="2dp"
-        android:textAlignment="viewEnd"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/storeName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Big Bazaar" />
+
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/storeAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:paddingEnd="5dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textColor="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/storeName"
+            tools:text="Koramangala" />
+
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/transactionDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="5dp"
+            android:paddingEnd="10dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textColor="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/storeAddress"
+            app:layout_constraintTop_toBottomOf="@id/storeName"
+            tools:text="5th May '17" />
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/storeAddress"
-        tools:text="@string/rupee"></TextView>
+        android:id="@+id/billView"
+        android:layout_marginRight="10dp">
 
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/storeAddress"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:padding="2dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        app:layout_constraintStart_toStartOf="@id/storeName"
-        app:layout_constraintTop_toBottomOf="@id/storeName"
-        tools:text="San Jose,"></TextView>
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/billCurrency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:paddingStart="10dp"
+            android:paddingEnd="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/billAmount"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/rupee" />
 
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/transactionDate"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:padding="2dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        app:layout_constraintStart_toEndOf="@id/storeAddress"
-        app:layout_constraintTop_toBottomOf="@id/storeName"
-        tools:text="12 Nov 2017"></TextView>
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/billAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="10dp"
+            android:paddingStart="2dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toEndOf="@id/billCurrency"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="57.45" />
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

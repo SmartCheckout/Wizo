@@ -58,12 +58,7 @@
         <string name="no_loc_scan_qr_store">Unable to find Location. Please scan store QR code</string>
         <string name="no_loc_perm_denied">Since we cannot access your location please scan store QR code to allow us to find which store you are at</string>
         <string name="scan_store_qr_button">Scan Store QR</string>
-        <string name="store_not_found">Unable to find the store. Plese scan store barcode again.</string>
-
-
-        <!--string name="no_loc_message">Sorry we are unable to find which store you are at. Please allow us to try once more or scan the store\'s QR code </string!-->
-        <string name="no_loc_message">Scan QR code of the store to start shopping</string>
-        <string name="no_connection_message">There was a connection failure and we could not find which store you are at. Please allow us to try once more or scan the store\'s QR code </string>
+        <string name="store_not_found">We had trouble locating your store. Try again by enabling location or scanning store QR code</string>
         <string name="find_location_button">Find Location</string>
         <string name="settings">Settings</string>
         <string name="pay_button">PAY ₹ </string>
@@ -98,5 +93,6 @@
     <string name="support_email">support-wizo@gmail.com"</string>
     <string name="past_transactions">Past Transactions</string>
     <string name="pending_transactions">Pending Transactions</string>
+    <string name="store_selection_permission_msg">Wizo needs to locate the store. Enable location settings for automatic detection. You can also scan the store\'s QR code</string>
 
 </resources>

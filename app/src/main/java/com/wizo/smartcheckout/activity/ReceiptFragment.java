@@ -1,20 +1,14 @@
 package com.wizo.smartcheckout.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,18 +18,13 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.google.zxing.EncodeHintType;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.razorpay.Checkout;
-import com.razorpay.PaymentResultListener;
 import com.wizo.smartcheckout.R;
 import com.wizo.smartcheckout.adapter.BillListViewAdapter;
 import com.wizo.smartcheckout.model.Bill;
@@ -47,8 +36,6 @@ import com.wizo.smartcheckout.util.SharedPreferrencesUtil;
 import com.wizo.smartcheckout.util.StateData;
 import com.wizo.smartcheckout.util.TransactionStatus;
 
-import net.glxn.qrgen.android.QRCode;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -59,92 +46,113 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 
-import static com.wizo.smartcheckout.constant.constants.CART_ACTIVITY;
 import static com.wizo.smartcheckout.constant.constants.SP_TRANSACTION_ID;
 import static com.wizo.smartcheckout.constant.constants.SP_TRANSACTION_STATUS;
-import static com.wizo.smartcheckout.constant.constants.SP_TRANSACTION_UPDATED_TS;
 import static com.wizo.smartcheckout.constant.constants.STORESELECTION_ACTIVITY;
 import static com.wizo.smartcheckout.constant.constants.TRANSACTION_SUMMARY_ACTIVITY;
-import static com.wizo.smartcheckout.constant.constants.TRANSACTION_UPDATE_EP;
 import static com.wizo.smartcheckout.constant.constants.TRANSACTION_URL;
 
 
 public class ReceiptFragment extends WizoFragment {
 
     private static String TAG = "ReceiptFragment";
-    private View view ;
+    private View view;
     private ListView mListView;
-    ImageView myImage ;
-    TextView amountView ;
-    TextView subtotalView ;
-    TextView taxView ;
-    TextView totalView ;
+    ImageView qrCodeImg;
+    TextView amountView;
+    TextView subtotalView;
+    TextView taxView;
+    TextView totalView;
     TextView savingsView;
     TextView storeNameView;
+    TextView status;
+    Button shopAgain, emailReceipt;
 
     String callingView = null;
+    String transactionId = null;
+    Bitmap transactionQR  = null;
 
     private AsyncHttpClient ahttpClient = new AsyncHttpClient();
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
-    {
+                             Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(view != null) {
+        if (view != null) {
             return view;
         }
 
-        view = inflater.inflate(R.layout.payment_success,container,false);
+        view = inflater.inflate(R.layout.transaction_summary, container, false);
         mListView = (ListView) view.findViewById(R.id.cart_list);
-         myImage = (ImageView) view.findViewById(R.id.trnsQRCode);
-         amountView = ((TextView) view.findViewById(R.id.amount));
-         subtotalView = ((TextView) view.findViewById(R.id.subtotalVal));
-         taxView = ((TextView) view.findViewById(R.id.taxVal));
-         totalView = ((TextView) view.findViewById(R.id.totalVal));
-         savingsView = ((TextView) view.findViewById(R.id.savingsVal));
+        qrCodeImg = (ImageView) view.findViewById(R.id.trnsQRCode);
+        amountView = ((TextView) view.findViewById(R.id.amount));
+        subtotalView = ((TextView) view.findViewById(R.id.subtotalVal));
+        taxView = ((TextView) view.findViewById(R.id.taxVal));
+        totalView = ((TextView) view.findViewById(R.id.totalVal));
+        savingsView = ((TextView) view.findViewById(R.id.savingsVal));
         storeNameView = ((TextView) view.findViewById(R.id.storeName));
-        Button shopAgain = (Button) view.findViewById(R.id.shopAgain);
+        shopAgain = (Button) view.findViewById(R.id.shopAgain);
+        status = view.findViewById(R.id.status);
+        emailReceipt = view.findViewById(R.id.receipt);
 
-        final String transactionId = getArguments().getString("TransactionId");
-        Button viewReciept =  view.findViewById(R.id.receipt);
+        transactionId = getArguments().getString("TransactionId");
+        transactionQR = CommonUtils.generateBitmap(transactionId, 0xFF000000, 0x00FFFFFF,
+                                                            CommonUtils.getScreenWidth(getActivity()) - 200,
+                                                            CommonUtils.getScreenWidth(getActivity()) - 200);
 
+        qrCodeImg.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Dialog builder = new Dialog(getActivity());
+                builder.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                builder.getWindow().setBackgroundDrawable(
+                        new ColorDrawable(Color.WHITE));
+                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialogInterface) {}});
+
+                ImageView imageView = new ImageView(getActivity());
+                WindowManager.LayoutParams params = builder.getWindow().getAttributes();
+
+                imageView.setImageBitmap(transactionQR);
+                //below code fullfil the requirement of xml layout file for dialoge popup
+                builder.addContentView(imageView, params);
+                builder.show();
+                return false;
+            }
+
+        });
 
         this.callingView = getArguments().getString("CallingView");
-        if(callingView != null && callingView.equalsIgnoreCase("History"))
-        {
-            Log.i(TAG,"Restoring cached transaction");
+        if (callingView != null && callingView.equalsIgnoreCase("History")) {
+            Log.i(TAG, "Restoring cached transaction");
             shopAgain.setVisibility(View.GONE);
-            viewReciept.setVisibility(View.GONE);
+            emailReceipt.setVisibility(View.GONE);
             Transaction cachedTransaction = null;
-            if(getArguments().getBoolean("isPending"))
-            {
-                for(Transaction transaction:StateData.pendingTransactionList)
-                {
-                    if(transaction.getTrnsId().equalsIgnoreCase(transactionId))
+            if (getArguments().getBoolean("isPending")) {
+                for (Transaction transaction : StateData.pendingTransactionList) {
+                    if (transaction.getTrnsId().equalsIgnoreCase(transactionId))
                         cachedTransaction = transaction;
 
                 }
-            }
-            else
-            {
-                for(Transaction transaction:StateData.pastTransactionList)
-                {
-                    if(transaction.getTrnsId().equalsIgnoreCase(transactionId))
+            } else {
+                for (Transaction transaction : StateData.approvedTransactionList) {
+                    if (transaction.getTrnsId().equalsIgnoreCase(transactionId))
                         cachedTransaction = transaction;
 
                 }
             }
 
-            if(cachedTransaction != null)
-            {
-                if(cachedTransaction.getCart() != null && cachedTransaction.getStore() != null && cachedTransaction.getBill() != null)
-                    restoreView(inflater,cachedTransaction.getTrnsId(),cachedTransaction.getCart(),cachedTransaction.getStore(),cachedTransaction.getBill(),new Date(cachedTransaction.getTrnsDate()));
+            if (cachedTransaction != null) {
+                if (cachedTransaction.getCart() != null && cachedTransaction.getStore() != null && cachedTransaction.getBill() != null)
+                    populateView(inflater, cachedTransaction.getTrnsId(), cachedTransaction.getStatus(), cachedTransaction.getCart(),
+                            cachedTransaction.getStore(), cachedTransaction.getBill(), new Date(cachedTransaction.getTrnsDate()));
 
                 return view;
             }
 
-        }
-        else {
+        } else {
 
             shopAgain.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -160,8 +168,7 @@ public class ReceiptFragment extends WizoFragment {
             });
 
 
-
-            viewReciept.setOnClickListener(new View.OnClickListener() {
+            emailReceipt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
@@ -172,45 +179,13 @@ public class ReceiptFragment extends WizoFragment {
 
         }
 
-        myImage.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Dialog builder = new Dialog(getActivity());
-                builder.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                builder.getWindow().setBackgroundDrawable(
-                        new ColorDrawable(Color.WHITE));
-                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialogInterface) {
-                        //nothing;
 
-                    }
-                });
-
-                ImageView imageView = new ImageView(getActivity());
-                WindowManager.LayoutParams params = builder.getWindow().getAttributes();
-                params.height = CommonUtils.getScreenWidth(getActivity()) - 200;
-                params.width = CommonUtils.getScreenWidth(getActivity()) - 200;
-                Bitmap myBitmap = QRCode.from(transactionId).withSize(params.height,params.width).withColor(0xFF000000,0x00FFFFFF).bitmap();
-                imageView.setImageBitmap(myBitmap);
-                //below code fullfil the requirement of xml layout file for dialoge popup
-
-
-                builder.addContentView(imageView, params);
-                builder.show();
-                return false;
-            }
-
-        });
-
-
-
-        if(StateData.transactionReceipt != null && StateData.transactionReceipt.getTrnsId().equalsIgnoreCase(transactionId))
-        {
+        if (StateData.transactionReceipt != null && StateData.transactionReceipt.getTrnsId().equalsIgnoreCase(transactionId)) {
             Transaction transaction = StateData.transactionReceipt;
 
-            if(transaction.getCart() != null && transaction.getStore() != null && transaction.getBill() != null)
-                restoreView(inflater,transaction.getTrnsId(),transaction.getCart(),transaction.getStore(),transaction.getBill(),new Date(transaction.getTrnsDate()));
+            if (transaction.getCart() != null && transaction.getStore() != null && transaction.getBill() != null)
+                populateView(inflater, transaction.getTrnsId(), transaction.getStatus(), transaction.getCart(),
+                        transaction.getStore(), transaction.getBill(), new Date(transaction.getTrnsDate()));
 
             return view;
         }
@@ -234,19 +209,22 @@ public class ReceiptFragment extends WizoFragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
 
-                Type listType = new TypeToken<ArrayList<CartItem>>() {}.getType();
+                Type listType = new TypeToken<ArrayList<CartItem>>() {
+                }.getType();
                 List<CartItem> cartList = null;
                 Bill bill = null;
                 Store store = null;
                 try {
-                    cartList = new Gson().fromJson(response.getJSONArray("cart").toString(), listType);
-                    store = new Gson().fromJson(response.getJSONObject("store").toString(), Store.class);
-                    bill = new Gson().fromJson(response.getJSONObject("bill").toString(), Bill.class);
+                    Gson gson = new Gson();
+                    cartList = gson.fromJson(response.getJSONArray("cart").toString(), listType);
+                    store = gson.fromJson(response.getJSONObject("store").toString(), Store.class);
+                    bill = gson.fromJson(response.getJSONObject("bill").toString(), Bill.class);
                     Date transcationDate = new Date(response.getLong("trnsDate"));
+                    String trnsStatus = response.getString("status");
 
                     nDialog.dismiss();
                     view.findViewById(R.id.billlayout).setVisibility(View.VISIBLE);
-                    restoreView(inflater,transactionId,cartList,store,bill,transcationDate);
+                    populateView(inflater, transactionId, trnsStatus, cartList, store, bill, transcationDate);
 
 
                 } catch (JSONException e) {
@@ -260,26 +238,25 @@ public class ReceiptFragment extends WizoFragment {
     }
 
 
-    public void restoreView(LayoutInflater inflater, String transactionId, List<CartItem> cartList, Store store, Bill bill, Date transcationDate )
-    {
-        Bitmap myBitmap = QRCode.from(transactionId).withSize(150,150).withColor(0xFF000000,0x00FFFFFF).bitmap();
-        myImage.setImageBitmap(myBitmap);
-        Log.d(TAG,"Transaction bitmap generated");
+    public void populateView(LayoutInflater inflater, String transactionId, String trnsStatus, List<CartItem> cartList, Store store, Bill bill, Date transcationDate) {
+        TransactionStatus eTrnsStatus = TransactionStatus.valueOf(trnsStatus);
+        qrCodeImg.setImageBitmap(transactionQR);
+        status.setText(eTrnsStatus.getDisplayName());
+        Log.d(TAG, "Transaction bitmap generated");
 
-        final View headerView =inflater.inflate(R.layout.bill_item_header,null);
+        final View headerView = inflater.inflate(R.layout.bill_item_header, null);
 
         mListView.addHeaderView(headerView);
 
 
-        BillListViewAdapter billViewAdapter = new BillListViewAdapter(getActivity(),cartList);
+        BillListViewAdapter billViewAdapter = new BillListViewAdapter(getActivity(), cartList);
         mListView.setAdapter(billViewAdapter);
 
-        if(store != null)
-        {
-            storeNameView.setText(store.getTitle()+","+store.getAddress().getCity());
+        if (store != null) {
+            storeNameView.setText(store.getTitle() + "," + store.getAddress().getCity());
         }
 
-        if(bill != null) {
+        if (bill != null) {
 
             String newtext = amountView.getText().toString().concat(String.valueOf(bill.getTotal()));
             amountView.setText(newtext);
@@ -299,13 +276,11 @@ public class ReceiptFragment extends WizoFragment {
     }
 
     @Override
-    public void onBackPressed()
-    {
-        if(callingView.equalsIgnoreCase("History"))
-        {
+    public void onBackPressed() {
+        if (callingView.equalsIgnoreCase("History")) {
             Bundle inputBundle = new Bundle();
-            inputBundle.putBoolean("cache",true);
-            ((MainActivity)getActivity()).launchFragment(TRANSACTION_SUMMARY_ACTIVITY,inputBundle);
+            inputBundle.putBoolean("cache", true);
+            ((MainActivity) getActivity()).launchFragment(TRANSACTION_SUMMARY_ACTIVITY, inputBundle);
 
         }
     }

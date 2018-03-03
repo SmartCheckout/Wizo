@@ -1,16 +1,10 @@
 package com.wizo.smartcheckout.activity;
 
 import android.content.Intent;
-import android.content.IntentSender;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.media.SyncParams;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -24,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -47,12 +40,8 @@ import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.ContentType;
 import cz.msebera.android.httpclient.entity.StringEntity;
 
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static com.wizo.smartcheckout.constant.constants.CART_ACTIVITY;
-import static com.wizo.smartcheckout.constant.constants.COMING_SOON_PAGE;
-import static com.wizo.smartcheckout.constant.constants.LOCATION_ACCURACY_LIMIT;
 import static com.wizo.smartcheckout.constant.constants.RC_CHECK_SETTING;
-import static com.wizo.smartcheckout.constant.constants.RC_LOCATION_PERMISSION;
 import static com.wizo.smartcheckout.constant.constants.RC_SCAN_BARCODE_STORE;
 import static com.wizo.smartcheckout.constant.constants.RECEIPT_ACTIVITY;
 import static com.wizo.smartcheckout.constant.constants.STORESELECTION_ACTIVITY;
@@ -195,7 +184,7 @@ public class MainActivity extends AppCompatActivity
                 return paymentSuccessFragment;
 
             case TRANSACTION_SUMMARY_ACTIVITY:
-                TransactionSummaryFragment transactionSummaryFragment = new TransactionSummaryFragment();
+                TransactionHistoryTabbedFragment transactionSummaryFragment = new TransactionHistoryTabbedFragment();
                 return transactionSummaryFragment;
 
         }
@@ -246,7 +235,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_shopnow) {
             FrameLayout frame =  findViewById(R.id.content_layout);
             frame.removeAllViews();
-            launchFragment(CART_ACTIVITY);
+            launchFragment(STORESELECTION_ACTIVITY);
 
 
         } else if (id == R.id.nav_search) {
@@ -276,13 +265,14 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_send) {
 
-            Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+            Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
             sendIntent.setType("plain/text");
-            sendIntent.setData(Uri.parse(getResources().getString(R.string.support_email)));
-            sendIntent.setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail");
+            sendIntent.setData(Uri.parse("mailto:"));
             sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Customer Feedback - "+new Date());
-            startActivity(sendIntent);
-
+            sendIntent.putExtra(Intent.EXTRA_EMAIL, Uri.parse(getResources().getString(R.string.support_email)));
+            if (sendIntent.resolveActivity(getPackageManager()) != null) {
+                startActivity(sendIntent);
+            }
         } else if (id == R.id.nav_signout) {
             StateData.store = null;
             StateData.storeId = null;
@@ -319,6 +309,7 @@ public class MainActivity extends AppCompatActivity
             updateTransReq.put("status", TransactionStatus.PAYMENT_SUCCESSFUL);
             updateTransReq.put("payment", new JSONArray().put(payment));
 
+            StateData.transactionReceipt.setStatus(TransactionStatus.PAYMENT_SUCCESSFUL.toString());
             StringEntity requestEntity = new StringEntity(updateTransReq.toString(), ContentType.APPLICATION_JSON);
 
             ahttpClient.post(this, TRANSACTION_UPDATE_EP, requestEntity, "application/json", new JsonHttpResponseHandler() {
@@ -332,7 +323,6 @@ public class MainActivity extends AppCompatActivity
                         Bundle bundle = new Bundle();
                         bundle.putString("TransactionId", StateData.transactionId);
                         bundle.putString("CallingView", "Cart");
-
                         launchFragment(RECEIPT_ACTIVITY,bundle);
 
                     } catch (Exception e) {
