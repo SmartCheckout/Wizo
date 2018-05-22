@@ -14,9 +14,9 @@ public class constants {
     public static final int RC_CHECK_SETTING = 2;
 
     // Endpoints
-    public static String STORE_SEARCH_URL= "http://ec2-54-191-68-157.us-west-2.compute.amazonaws.com:8080/store/";
-    public static String PRODUCT_SEARCH_URL="http://ec2-54-191-68-157.us-west-2.compute.amazonaws.com:8080/product/";
-    public static String TRANSACTION_URL = "http://ec2-54-191-68-157.us-west-2.compute.amazonaws.com:8080/transaction/";
+    public static String STORE_SEARCH_URL= "http://ec2-18-191-77-172.us-east-2.compute.amazonaws.com:8080/store/";
+    public static String PRODUCT_SEARCH_URL="http://ec2-18-191-77-172.us-east-2.compute.amazonaws.com:8080/product/";
+    public static String TRANSACTION_URL = "http://ec2-18-191-77-172.us-east-2.compute.amazonaws.com:8080/transaction/";
 
 
     public static String TRANSACTION_CREATE_EP = TRANSACTION_URL + "create/";
