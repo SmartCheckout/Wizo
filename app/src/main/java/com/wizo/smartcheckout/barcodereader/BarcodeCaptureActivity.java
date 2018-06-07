@@ -504,7 +504,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
     @Override
     public void onBarcodeDetected(Barcode barcode) {
         //do something with barcode data returned
-        returnToCaller(barcode.toString());
+        returnToCaller(barcode.rawValue);
     }
 
     private void returnToCaller(String barcode){

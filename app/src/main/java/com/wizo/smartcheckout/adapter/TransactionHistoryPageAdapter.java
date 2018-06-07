@@ -42,9 +42,9 @@ public class TransactionHistoryPageAdapter extends FragmentStatePagerAdapter{
         // Generate title based on item position
         switch (position) {
             case 0:
-                return "Pending";
+                return "Paid";
             case 1:
-                return "Completed";
+                return "Approved";
             default:
                 return null;
         }

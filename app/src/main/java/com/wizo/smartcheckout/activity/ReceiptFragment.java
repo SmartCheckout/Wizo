@@ -161,9 +161,6 @@ public class ReceiptFragment extends WizoFragment {
                     StateData.transactionId = null;
                     ((MainActivity) getActivity()).launchFragment(STORESELECTION_ACTIVITY, null);
 
-                    SharedPreferrencesUtil.setStringPreference(getActivity(), SP_TRANSACTION_ID, null);
-                    SharedPreferrencesUtil.setStringPreference(getActivity(), SP_TRANSACTION_STATUS, null);
-
                 }
             });
 

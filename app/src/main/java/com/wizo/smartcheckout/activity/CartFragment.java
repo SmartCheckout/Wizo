@@ -1,6 +1,7 @@
 package com.wizo.smartcheckout.activity;
 
 import android.app.Activity;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -207,19 +209,22 @@ public class CartFragment extends WizoFragment implements PaymentResultListener 
         super.onStop();
         System.out.println("OnStop of activity fragment");
         try {
-            persistTransactionData(false,TransactionStatus.SUSPENDED);
-            // if the cart is empty dont remember this transaction
-            if(cartAdapter != null && cartAdapter.getCartItemList() != null && cartAdapter.getCount() > 0)
-            {
-                SharedPreferrencesUtil.setStringPreference(getActivity(),SP_TRANSACTION_ID,StateData.transactionId);
-                SharedPreferrencesUtil.setDatePreference(getActivity(),SP_TRANSACTION_UPDATED_TS, CommonUtils.getCurrentDate());
-                SharedPreferrencesUtil.setStringPreference(getActivity(),SP_TRANSACTION_STATUS, TransactionStatus.SUSPENDED.name());
+            if(StateData.status != TransactionStatus.PAYMENT_SUCCESSFUL){
+                persistTransactionData(false,TransactionStatus.SUSPENDED);
+                // if the cart is empty dont remember this transaction
+                if(cartAdapter != null && cartAdapter.getCartItemList() != null && cartAdapter.getCount() > 0)
+                {
+                    SharedPreferrencesUtil.setStringPreference(getActivity(),SP_TRANSACTION_ID,StateData.transactionId);
+                    SharedPreferrencesUtil.setDatePreference(getActivity(),SP_TRANSACTION_UPDATED_TS, CommonUtils.getCurrentDate());
+                    SharedPreferrencesUtil.setStringPreference(getActivity(),SP_TRANSACTION_STATUS, TransactionStatus.SUSPENDED.name());
 
+                }
+                else
+                {
+                    SharedPreferrencesUtil.setStringPreference(getActivity(),SP_TRANSACTION_ID,null);
+                }
             }
-            else
-            {
-                SharedPreferrencesUtil.setStringPreference(getActivity(),SP_TRANSACTION_ID,null);
-            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -235,7 +240,8 @@ public class CartFragment extends WizoFragment implements PaymentResultListener 
                     if(barcode != null) {
                         System.out.println("=====> Control returned from Scan Barcode Activity. Barcode : " + barcode);
                         // TODO: Change it to backend later
-                        populateDummyScanProd();
+                        //populateDummyScanProd();
+                        handleBarcode(barcode);
                     }
                 }
                 else if(resultCode == RESULT_CANCELED )
@@ -409,7 +415,7 @@ public class CartFragment extends WizoFragment implements PaymentResultListener 
         //Get Product Details
         RequestParams params = new RequestParams();
 
-        params.put("id", barcode);
+        params.put("sku", barcode);
         System.out.println("Sending request to search product");
         //progressBar.setVisibility(View.VISIBLE);
 
@@ -438,7 +444,7 @@ public class CartFragment extends WizoFragment implements PaymentResultListener 
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
                 System.out.println("Failed to fetch product");
-
+                Snackbar.make(view, "Product not found.", Snackbar.LENGTH_SHORT).show();
             }
 
 

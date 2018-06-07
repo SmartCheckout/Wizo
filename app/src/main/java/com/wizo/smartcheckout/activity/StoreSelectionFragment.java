@@ -304,7 +304,8 @@ public class StoreSelectionFragment extends WizoFragment implements FragmentComp
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Store selectedStore = new Store();
+
+                Store selectedStore = new Gson().fromJson(response.toString(), Store.class);
                 try{
                     selectedStore.setDisplayAddress(response.getString("displayAddress"));
                     selectedStore.setId(response.getString("id"));

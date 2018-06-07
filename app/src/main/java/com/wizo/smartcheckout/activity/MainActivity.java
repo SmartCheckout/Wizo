@@ -28,6 +28,7 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.razorpay.PaymentResultListener;
 import com.wizo.smartcheckout.R;
+import com.wizo.smartcheckout.util.SharedPreferrencesUtil;
 import com.wizo.smartcheckout.util.StateData;
 import com.wizo.smartcheckout.util.TransactionStatus;
 
@@ -44,6 +45,8 @@ import static com.wizo.smartcheckout.constant.constants.CART_ACTIVITY;
 import static com.wizo.smartcheckout.constant.constants.RC_CHECK_SETTING;
 import static com.wizo.smartcheckout.constant.constants.RC_SCAN_BARCODE_STORE;
 import static com.wizo.smartcheckout.constant.constants.RECEIPT_ACTIVITY;
+import static com.wizo.smartcheckout.constant.constants.SP_TRANSACTION_ID;
+import static com.wizo.smartcheckout.constant.constants.SP_TRANSACTION_STATUS;
 import static com.wizo.smartcheckout.constant.constants.STORESELECTION_ACTIVITY;
 import static com.wizo.smartcheckout.constant.constants.TRANSACTION_SUMMARY_ACTIVITY;
 import static com.wizo.smartcheckout.constant.constants.TRANSACTION_UPDATE_EP;
@@ -309,8 +312,12 @@ public class MainActivity extends AppCompatActivity
             updateTransReq.put("status", TransactionStatus.PAYMENT_SUCCESSFUL);
             updateTransReq.put("payment", new JSONArray().put(payment));
 
+            StateData.status = TransactionStatus.PAYMENT_SUCCESSFUL;
             StateData.transactionReceipt.setStatus(TransactionStatus.PAYMENT_SUCCESSFUL.toString());
             StringEntity requestEntity = new StringEntity(updateTransReq.toString(), ContentType.APPLICATION_JSON);
+
+            SharedPreferrencesUtil.setStringPreference(this, SP_TRANSACTION_ID, null);
+            SharedPreferrencesUtil.setStringPreference(this, SP_TRANSACTION_STATUS, null);
 
             ahttpClient.post(this, TRANSACTION_UPDATE_EP, requestEntity, "application/json", new JsonHttpResponseHandler() {
                 @Override
