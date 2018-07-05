@@ -25,16 +25,16 @@
         <string name="barcode_error">"Error reading barcode: %1$s"</string>
         <string name="sign_in_cancelled">"Sign In cancelled"</string>
         <string name="no_internet_connection">"No internet connection. Could not sign in."</string>
-        <string name="unknown_error">"We encountered an unknown error. Could not login."</string>
+        <string name="unknown_error">"We encountered an error. Could not login."</string>
         <string name="sign_out">"Sign Out"</string>
         <string name="help">"Help"</string>
-        <!-- Facebook sogn in-->
-        <string name="facebook_application_id" translatable="false">1943792502507767</string>
-        <!-- Facebook Application ID, prefixed by 'fb'.  Enables Chrome Custom tabs. -->
-        <string name="facebook_login_protocol_scheme" translatable="false">fb1943792502507767</string>
-        <!-- Twitter sign in-->
-        <string name="twitter_consumer_key" translatable="false">8tfuwaTi8lXxBA5ougmL0F695</string>
-        <string name="twitter_consumer_secret" translatable="false">ArQhWa9RbltWAudIDXzxkboJRsoKbVBcp3rz4mT9mk1qtRn9ro</string>
+        <!--&lt;!&ndash; Facebook sogn in&ndash;&gt;-->
+        <!--<string name="facebook_application_id" translatable="false">1943792502507767</string>-->
+        <!--&lt;!&ndash; Facebook Application ID, prefixed by 'fb'.  Enables Chrome Custom tabs. &ndash;&gt;-->
+        <!--<string name="facebook_login_protocol_scheme" translatable="false">fb1943792502507767</string>-->
+        <!--&lt;!&ndash; Twitter sign in&ndash;&gt;-->
+        <!--<string name="twitter_consumer_key" translatable="false">8tfuwaTi8lXxBA5ougmL0F695</string>-->
+        <!--<string name="twitter_consumer_secret" translatable="false">ArQhWa9RbltWAudIDXzxkboJRsoKbVBcp3rz4mT9mk1qtRn9ro</string>-->
 
         <string name="title_activity_login">Sign in</string>
 

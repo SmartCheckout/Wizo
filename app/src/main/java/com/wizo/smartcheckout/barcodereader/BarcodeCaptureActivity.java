@@ -29,6 +29,7 @@ import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -432,7 +433,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
 
         if (best != null) {
             Intent data = new Intent();
-            data.putExtra(BarcodeObject, best);
+            data.putExtra(BarcodeObject, (Parcelable) best);
             setResult(CommonStatusCodes.SUCCESS, data);
             finish();
             return true;
