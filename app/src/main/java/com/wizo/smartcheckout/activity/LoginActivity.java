@@ -8,12 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.BuildConfig;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
-import com.firebase.ui.auth.ResultCodes;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.firebase.ui.auth.BuildConfig;
 import com.wizo.smartcheckout.R;
 import com.wizo.smartcheckout.util.CommonUtils;
 import com.wizo.smartcheckout.util.StateData;
@@ -57,10 +56,10 @@ public class LoginActivity extends AppCompatActivity {
                         startActivityForResult(
                                 AuthUI.getInstance()
                                         .createSignInIntentBuilder()
-                                        .setIsSmartLockEnabled(!BuildConfig.DEBUG)
-                                        .setProviders(Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
-                                                new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build(),
-                                                new AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build()))
+                                        .setIsSmartLockEnabled(!BuildConfig.DEBUG /* credentials */, true /* hints */)
+                                        .setAvailableProviders(Arrays.asList(new AuthUI.IdpConfig.EmailBuilder().build(),
+                                                new AuthUI.IdpConfig.GoogleBuilder().build()
+                                        ))
                                         .setTheme(R.style.AppTheme)
                                         .build(),
                                 RC_SIGN_IN);
@@ -134,7 +133,7 @@ public class LoginActivity extends AppCompatActivity {
             IdpResponse response = IdpResponse.fromResultIntent(data);
 
             // Successfully signed in
-            if (resultCode == ResultCodes.OK) {
+            if (resultCode == RESULT_OK) {
                 onSignInInitialize();
                 return;
             } else {
@@ -145,15 +144,14 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (response.getErrorCode() == ErrorCodes.NO_NETWORK) {
+                if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
                     showSnackbar(R.string.no_internet_connection);
                     return;
                 }
 
-                if (response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                    showSnackbar(R.string.unknown_error);
-                    return;
-                }
+                showSnackbar(R.string.unknown_error);
+                Log.e(TAG, "Sign-in error: ", response.getError());
+
             }
 
         }
@@ -189,4 +187,5 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
     }
+
 }
